@@ -47,5 +47,7 @@ def sample_graph(G, walk_len, num_of_iter):
     for n in G.nodes():
         n_walk = random_walk(G, n, walk_len=walk_len, num_of_iter=num_of_iter)
         all_walks = all_walks + n_walk # concat two lists
+    print(len(all_walks))
+    print(len(all_walks[0]))
     return all_walks
     
