@@ -1,39 +1,41 @@
 from preprocess import read_node_file, build_graph
-import random_walk
-import classification
-import word2vec
 from gensim.test.utils import common_texts
 from gensim.models import Word2Vec
-from util import save_dict
+from util import save_dict, save_word2vec
 from visualize import visualize
-
-def main():
-    # change to parse args later
-    # parameters
-    walk_len = 10
-    num_of_iter = 10
-    emb_size = 128
-    window_size = 10 # window_size for word2vec
-    node_label_file_path = './data/facebook_large/musae_facebook_target.csv'
-    edge_list_file_path = './data/facebook_large/musae_facebook_edges.csv'
+from word2vec import generate_emb
+from random_walk import sample_graph
+from classification import classify
+from config import *
     
-    # generate random walks
+    
+def main():
+    print("----------------Phase 1: preprocess----------------")
+    # load data
+    id2label, id2name = read_node_file(node_label_file_path)
+    save_dict(id2label_path, id2label)
+    save_dict(id2name_path, id2name)
+    print("Data loaded")
+    # build graph
     G = build_graph(edge_list_file_path)
     print("Graph built")
-    random_walk_res = random_walk.sample_graph(G, walk_len=walk_len, num_of_iter=num_of_iter)
+    print("----------------Phase 2: deepwalk------------------")
+    # generate random walks
+    random_walk_res = sample_graph(G, walk_len=walk_len, num_of_iter=num_of_iter)
     print("Random walk finished")
-    emb_dict = word2vec.generate_emb(G=G, random_walks=random_walk_res, window_size=window_size, emb_size=emb_size)
-    save_dict("embeddings.pkl", emb_dict)
+    # use word2vec for embedding
+    model, embeddings = generate_emb(G=G, random_walks=random_walk_res, window_size=window_size, emb_size=emb_size)
     print("Embeddings generated")
-
+    save_word2vec(word2vec_model_path, model)
+    save_dict(embedding_path, embeddings)
+    print("Results saved")
+    print("--------------Phase 3: classification--------------")
     # perform node classification, calculate f1-score
-    node_label_dict, node_name_dict = read_node_file(node_label_file_path)
-    save_dict("labels.pkl", node_label_dict)
-    save_dict("names.pkl", node_name_dict)
-    scores = classification.classify(emb_dict, node_label_dict)
+    scores = classify(embeddings, id2label)
     print(scores)
 
-    visualize(emb_dict, node_label_dict, node_name_dict)
+    # optional step
+    # visualize(word2vec_model_path, embedding_path)
     
 if __name__ == "__main__":
     main()

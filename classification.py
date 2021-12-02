@@ -2,45 +2,69 @@ from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
 from sklearn.neural_network import MLPClassifier
 
+def load_data(embeddings, id2label):
+    """ load training labels
 
+    Args:
+        embeddings (dict): id to embedding
+        id2label (dict): [description]
 
-def load_x(embeddings_dict):
-    x = []
-    for key in embeddings_dict:
-        x.append(embeddings_dict[key])
-    return x
-
-
-def load_y(embeddings_dict, node_labels_dict):
+    Returns:
+        [type]: [description]
+    """
+    X = []
     y = []
-    for key in embeddings_dict:
-        y.append(node_labels_dict[key])
-    return y
+    for key in embeddings:
+        X.append(embeddings[key])
+        y.append(id2label[key])
+    return X, y
 
+def split(X, y):
+    """ split the data into training and test sets
 
-def split(x, y):
+    Args:
+        X (list)
+        y (list)
+        
+    Returns:
+        train and test splits of X and y
+    """
     x_train, x_test, y_train, y_test = train_test_split(
-        x, y, test_size=0.20, random_state=42, shuffle=True)
+        X, y, test_size=0.20, random_state=42, shuffle=True)
     return x_train, x_test, y_train, y_test
 
+def train(X, y):
+    """ train a MLP classifier
 
-def train(x, y):
+    Args:
+        X (list): features
+        y (list): labels
+        
+    Returns:
+        [classifier]: trained classifier
+    """
     classifier = MLPClassifier()
-    classifier.fit(x, y)
+    classifier.fit(X, y)
     return classifier
 
+def test(classifier, X, y_true):
+    """ test the performance of the trained classifier
 
-def test(classifier, x, y_true):
-    y_pred = classifier.predict(x)
-    # return classification_report(y_true, y_pred, labels=['politician', 'company', 'government', 'tvshow'])
+    Args:
+        classifier: ...
+        X (list): test X
+        y_true (list): test label
+
+    Returns:
+        classification report containing accuracy, f1-score, etc.
+    """
+    y_pred = classifier.predict(X)
     return classification_report(y_true, y_pred, target_names=['politician', 'company', 'government', 'tvshow'])
 
-
-def classify(embeddings_dict, node_labels_dict):
-    x = load_x(embeddings_dict)
-    y = load_y(embeddings_dict, node_labels_dict)
+def classify(embeddings, id2label):
+    X, y = load_data(embeddings, id2label)
     print("data loaded")
-    x_train, x_test, y_train, y_test = split(x, y)
+    x_train, x_test, y_train, y_test = split(X, y)
     print("split finished")
     classifier = train(x_train, y_train)
     print("training finished")
