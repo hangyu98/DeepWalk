@@ -4,6 +4,8 @@ import classification
 import word2vec
 from gensim.test.utils import common_texts
 from gensim.models import Word2Vec
+from util import save_dict
+from visualize import visualize
 
 def main():
     # change to parse args later
@@ -21,12 +23,17 @@ def main():
     random_walk_res = random_walk.sample_graph(G, walk_len=walk_len, num_of_iter=num_of_iter)
     print("Random walk finished")
     emb_dict = word2vec.generate_emb(G=G, random_walks=random_walk_res, window_size=window_size, emb_size=emb_size)
+    save_dict("embeddings.pkl", emb_dict)
     print("Embeddings generated")
 
     # perform node classification, calculate f1-score
     node_label_dict, node_name_dict = read_node_file(node_label_file_path)
+    save_dict("labels.pkl", node_label_dict)
+    save_dict("names.pkl", node_name_dict)
     scores = classification.classify(emb_dict, node_label_dict)
     print(scores)
+
+    visualize(emb_dict, node_label_dict, node_name_dict)
     
 if __name__ == "__main__":
     main()

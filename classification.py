@@ -1,7 +1,7 @@
+from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
 from sklearn.neural_network import MLPClassifier
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.metrics import classification_report
+
 
 
 def load_x(embeddings_dict):
