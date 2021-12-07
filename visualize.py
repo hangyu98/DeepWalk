@@ -10,7 +10,7 @@ from config import *
 
 def visualize(interest_lst, topk):
     # load model and embeddings
-    model = load_word2vec(word2vec_model_path)
+    
     embeddings = pickle.load(open(embedding_path, 'rb'))
     id2name = pickle.load(open(id2name_path, 'rb'))
     
@@ -18,8 +18,11 @@ def visualize(interest_lst, topk):
     wanted = []
     for id in interest_lst:
         vec = embeddings[id]
-        # most_similar_words = model.wv.most_similar( [ vec ], [], topk)
-        most_similar_words = find_closest(id, embeddings, topk)
+        if usingGensim == True:
+            model = load_word2vec(word2vec_model_path)
+            most_similar_words = model.wv.most_similar( [ vec ], [], topk)
+        else:
+            most_similar_words = find_closest(id, embeddings, topk)
         for id2sim in most_similar_words:
             wanted.append(id2sim[0])
             
@@ -59,7 +62,7 @@ def visualize(interest_lst, topk):
     
     # add text labels
     for line in range(0, len(df['name'])):
-        plt.text(df['x'][line]+0.2, df['y'][line], df['name'][line], horizontalalignment='left', size=5, color='black', weight='semibold')
+        plt.text(df['x'][line]+0.2, df['y'][line], df['name'][line], horizontalalignment='left', size=6, color='black', weight='semibold')
     
     plt.show()
     

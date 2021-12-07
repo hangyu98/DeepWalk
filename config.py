@@ -11,3 +11,4 @@ word2vec_model_path = "word2vec.model"
 embedding_path = "embeddings.pkl"
 id2label_path = "labels.pkl"
 id2name_path = "names.pkl"
+usingGensim = False

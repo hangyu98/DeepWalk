@@ -27,7 +27,8 @@ def main():
     print(random_walk_res[0])
     model, embeddings = generate_emb(G=G, random_walks=random_walk_res, window_size=window_size, emb_size=emb_size)
     print("Embeddings generated")
-    save_word2vec(word2vec_model_path, model)
+    if usingGensim == true:
+        save_word2vec(word2vec_model_path, model)
     save_dict(embedding_path, embeddings)
     print("Results saved")
     print("--------------Phase 3: classification--------------")
