@@ -10,7 +10,7 @@ def read_node_file(node_file_name):
     """
     node_name_dict = {}
     node_label_dict = {}
-    with open(node_file_name, 'r') as node_list:
+    with open(node_file_name, 'r', encoding="utf-8") as node_list:
         csv_reader = csv.reader(node_list)
         next(csv_reader) # skip file header
         for row in csv_reader:

@@ -21,6 +21,8 @@ def visualize(interest_lst, topk):
         most_similar_words = model.wv.most_similar( [ vec ], [], topk)
         for id2sim in most_similar_words:
             wanted.append(id2sim[0])
+            
+    print(wanted)
     
     word_vectors = np.array([embeddings[w] for w in embeddings if w in wanted])
     word_names = np.array([w for w in embeddings if w in wanted])

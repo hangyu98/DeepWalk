@@ -24,6 +24,7 @@ def main():
     random_walk_res = sample_graph(G, walk_len=walk_len, num_of_iter=num_of_iter)
     print("Random walk finished")
     # use word2vec for embedding
+    print(random_walk_res[0])
     model, embeddings = generate_emb(G=G, random_walks=random_walk_res, window_size=window_size, emb_size=emb_size)
     print("Embeddings generated")
     save_word2vec(word2vec_model_path, model)
@@ -36,6 +37,8 @@ def main():
 
     # optional step
     # visualize(word2vec_model_path, embedding_path)
+    # interest_lst = ['0', '8005', '1293', '1366']
+    # visualize(interest_lst=interest_lst, topk=20)
     
 if __name__ == "__main__":
     main()
