@@ -10,6 +10,11 @@
 #### Visualize embeddings (optional):
 ```python visualize.py```
 
+#### The enable gensim library implementation of Word2Vec(accelerated):
+change variable  ```usingGensim``` to 'True' in ```config.py```(This is default setting)
+
+Otherwise set ```usingGensim``` to 'True' to see our original implementation (takes longer to run)
+
 ## Evaluation
 ...
 

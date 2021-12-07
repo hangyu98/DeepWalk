@@ -57,7 +57,7 @@ def generate_emb(G, random_walks, window_size, emb_size):
               data.append([int(word), int(nb_word)])
 
       print("---finished splitting data---")   
-      BSZ, EPOCHS = 512, 1
+      BSZ, EPOCHS = 512, 10
       data = np.array(data)
       print(data.shape)            
       vocab_size = 22500
