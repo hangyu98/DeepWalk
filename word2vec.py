@@ -2,12 +2,13 @@ from gensim.models import Word2Vec
 import tensorflow as tf
 import numpy as np
 from tensorflow.keras import Model
+import random
 
 class W2V(Model):
   # TODO: Create Network Weights
   def __init__(self, EMBEDDING_SZ, VOCAB_SZ):
     super(W2V, self).__init__()
-    self.EMBEDDING_SZ = EMBEDDING_SZ
+    self.EMBEDDING_SZ = 32
     self.VOCAB_SZ = VOCAB_SZ
     self.E = tf.Variable(tf.random.normal([self.VOCAB_SZ,self.EMBEDDING_SZ], stddev=.1, dtype=tf.float32))
     self.W = tf.Variable(tf.random.normal([self.EMBEDDING_SZ,self.VOCAB_SZ], stddev=.1, dtype=tf.float32))
@@ -36,24 +37,38 @@ def generate_emb(G, random_walks, window_size, emb_size):
     Returns:
         dict: map from id to embedding vector
     """
-    word2vec = Word2Vec(random_walks,
-                        window=window_size, sg=1)
+    window_size = 3
+    # word2vec = Word2Vec(random_walks,
+    #                     window=window_size, sg=1)
     
     data = []
+    # print(G[0])
+    # print(G[1])
+    # print(G[3])
+    print(random_walks[0])
+    print(random_walks[1])
+    print(random_walks[3])
     
-    for sentence in G:
+    for sentence in random_walks:
         for word_index, word in enumerate(sentence):
             for nb_word in sentence[max(word_index-int(window_size),0):min(word_index+int(window_size),len(sentence))]: # hint: Consider the cases near the boundary of sentences.
                 if nb_word != word:
                     data.append([int(word), int(nb_word)])
                     
-                    
+    print("---finished splitting data---")   
+    # random.shuffle(data) 
+    # print(len(data))            
     # print(data)
     vocab_size = 22500
-    BSZ, EPOCHS = 128, 10
+    BSZ, EPOCHS = 8192, 1
     data = np.array(data)
+    print(data.shape)
+    
+    
     model = W2V(emb_size,vocab_size)
-    optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
+    optimizer = tf.keras.optimizers.Adam(learning_rate=0.0001)
+    
+    print("---training starts---")
     
     for ep in range(EPOCHS):
         curr_loss = 0
@@ -68,8 +83,8 @@ def generate_emb(G, random_walks, window_size, emb_size):
             gradients = tape.gradient(loss, model.trainable_variables)
             optimizer.apply_gradients(zip(gradients, model.trainable_variables))
         
-        if ep % 1 == 0:
-            print('Epoch %d\tLoss: %.3f' % (ep, curr_loss / step))
+            if start % 10 == 0:
+                print('Epoch %d\tLoss: %.3f' % (start, loss))
             
     embeddingsMatrix = model.E.read_value()
     
@@ -77,7 +92,7 @@ def generate_emb(G, random_walks, window_size, emb_size):
     for n in G.nodes():
         embeddings[n] = embeddingsMatrix[int(n)]
 
-    return word2vec, embeddings
+    return model, embeddings
 
 def run_batch(model, inputs, labels):
   logits = model(inputs)

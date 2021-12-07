@@ -18,7 +18,8 @@ def visualize(interest_lst, topk):
     wanted = []
     for id in interest_lst:
         vec = embeddings[id]
-        most_similar_words = model.wv.most_similar( [ vec ], [], topk)
+        # most_similar_words = model.wv.most_similar( [ vec ], [], topk)
+        most_similar_words = find_closest(id, embeddings, topk)
         for id2sim in most_similar_words:
             wanted.append(id2sim[0])
             
@@ -61,6 +62,27 @@ def visualize(interest_lst, topk):
         plt.text(df['x'][line]+0.2, df['y'][line], df['name'][line], horizontalalignment='left', size=5, color='black', weight='semibold')
     
     plt.show()
+    
+def euclidean_dist(vec1, vec2):
+    return np.sqrt(np.sum((vec1-vec2)**2))
+
+# Return the id of the word with smallest euclidean distance to the queried word(index)
+def find_closest(id, vectors, topk):
+    min_dist = 10000 # to act like positive infinity
+    min_index = -1
+    query_vector = vectors[id]
+    minVectors = []
+    distList = []
+    for nodes in vectors:
+        dist = euclidean_dist(vector, query_vector)
+        vector = embeddings[node]
+        if len(dist)<10:
+            minVector.appen(vector)
+            distList.append(dist)
+        if euclidean_dist(vector, query_vector) < min_dist and not np.array_equal(vector, query_vector):
+            min_dist = euclidean_dist(vector, query_vector)
+            min_index = index
+    return minVectors
 
  # the voice of china (tvshow), facebook (company), Bernie Sanders (politician), UK government (government)
 interest_lst = ['0', '8005', '1293', '1366']

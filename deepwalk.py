@@ -2,7 +2,7 @@ from preprocess import read_node_file, build_graph
 from gensim.test.utils import common_texts
 from gensim.models import Word2Vec
 from util import save_dict, save_word2vec
-from visualize import visualize
+# from visualize import visualize
 from word2vec import generate_emb
 from random_walk import sample_graph
 from classification import classify
