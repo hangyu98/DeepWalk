@@ -18,15 +18,20 @@ def visualize(interest_lst, topk):
     wanted = []
     for id in interest_lst:
         vec = embeddings[id]
+        # print(vec)
         if usingGensim == True:
             model = load_word2vec(word2vec_model_path)
             most_similar_words = model.wv.most_similar( [ vec ], [], topk)
+            for id2sim in most_similar_words:
+                wanted.append(id2sim[0])
         else:
             most_similar_words = find_closest(id, embeddings, topk)
-        for id2sim in most_similar_words:
-            wanted.append(id2sim[0])
+            for id2sim in most_similar_words:
+                wanted.append(id2sim)
+        
             
-    print(wanted)
+    if plotting_untrained == True:
+        wanted = plot_members
     
     word_vectors = np.array([embeddings[w] for w in embeddings if w in wanted])
     word_names = np.array([w for w in embeddings if w in wanted])
@@ -70,22 +75,40 @@ def euclidean_dist(vec1, vec2):
     return np.sqrt(np.sum((vec1-vec2)**2))
 
 # Return the id of the word with smallest euclidean distance to the queried word(index)
-def find_closest(id, vectors, topk):
+def find_closest(id, embeddings, topk):
+    # print("operating on id: "+id)
+    
     min_dist = 10000 # to act like positive infinity
     min_index = -1
-    query_vector = vectors[id]
+    query_vector = embeddings[id]
+    # print(query_vector)
+    # print(query_vector)
+    # print(query_vector)
     minVectors = []
     distList = []
-    for nodes in vectors:
+    nodeList = []
+    for nodes in embeddings:
+        # print (type(nodes))
+        vector = embeddings[nodes]
         dist = euclidean_dist(vector, query_vector)
-        vector = embeddings[node]
-        if len(dist)<10:
-            minVector.appen(vector)
+         
+        if len(distList)<topk:
+            minVectors.append(vector)
             distList.append(dist)
-        if euclidean_dist(vector, query_vector) < min_dist and not np.array_equal(vector, query_vector):
-            min_dist = euclidean_dist(vector, query_vector)
-            min_index = index
-    return minVectors
+            nodeList.append(nodes)
+        if len(distList)>=10 and dist < max(distList):
+            # print("new node: "+nodes)
+            index = distList.index(max(distList))
+            # print("has index: "+ str(index))
+            # print(distList)
+            distList[index] = dist
+            minVectors[index] = vector
+            nodeList[index] = nodes
+            # print(distList)
+            # print(nodeList)
+    #         min_index = index
+    # print(nodeList)
+    return nodeList
 
  # the voice of china (tvshow), facebook (company), Bernie Sanders (politician), UK government (government)
 interest_lst = ['0', '8005', '1293', '1366']
