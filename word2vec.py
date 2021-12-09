@@ -57,7 +57,7 @@ def generate_emb(G, random_walks, window_size, emb_size):
               data.append([int(word), int(nb_word)])
 
       print("---finished splitting data---")   
-      BSZ, EPOCHS = 512, 10
+      BSZ, EPOCHS = 512, 20
       data = np.array(data)
       print(data.shape)            
       vocab_size = 22500
@@ -67,6 +67,7 @@ def generate_emb(G, random_walks, window_size, emb_size):
       
       print("---training starts---")
       for ep in range(EPOCHS):
+        print(EPOCHS)
         curr_loss = 0
         step = 0
         for start, end in zip(range(0, len(data) - BSZ, BSZ), range(BSZ, len(data), BSZ)):
@@ -80,14 +81,14 @@ def generate_emb(G, random_walks, window_size, emb_size):
           optimizer.apply_gradients(zip(gradients, model.trainable_variables))
 
           if start % 10 == 0:
-            print('Epoch %d\tLoss: %.3f' % (start, loss))
+            print('Epoch %d\t batch %d\tLoss: %.3f' % (ep, start, loss))
 
         embeddingsMatrix = model.E.read_value()
         embeddings = {}
-        for n in G.nodes():
-          embeddings[n] = embeddingsMatrix[int(n)]
+      for n in G.nodes():
+        embeddings[n] = embeddingsMatrix[int(n)]
 
-        return model, embeddings
+      return model, embeddings
 
 
     
