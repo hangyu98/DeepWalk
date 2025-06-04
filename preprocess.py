@@ -1,38 +1,50 @@
+# Standard library imports
 import csv
+
+# External library imports
 import networkx as nx
+from networkx import Graph
 
-def read_node_file(node_file_name):
-    """ Read the edge list file, and node label file.
-        Return a dict mapping node id to node label, and a dict mapping node id to node name.
-    Args:
-        edge_file_name (str): name of the file
-        node_file_name (str): name of the file
+
+def get_node_mappings(node_file_path: str) -> tuple[dict[str, str], dict[str, str]]:
     """
-    node_name_dict = {}
-    node_label_dict = {}
-    with open(node_file_name, 'r', encoding="utf-8") as node_list:
-        csv_reader = csv.reader(node_list)
-        next(csv_reader) # skip file header
-        for row in csv_reader:
-            n_id = row[0]
-            name = row[2]
-            label = row[3]
-            node_name_dict[n_id] = name
-            node_label_dict[n_id] = label
-        node_list.close()
-    return node_label_dict, node_name_dict
+    Read the edge list file, and node label file.
+    Return a dict mapping node id to node label, and a dict mapping node id to node name.
 
-def build_graph(edge_list_path):
-    """ Build an undirected graph from edge list
+    Args:
+        node_file_path (str): name of the file
+
+    Returns:
+        tuple[dict[str, str], dict[str, str]]: mappings from node_id to labels, and node_id to names
+    """
+
+    NODE_ID_IDX = 0
+    NODE_NAME_IDX = 2
+    NODE_LABEL_IDX = 3
+
+    with open(file=node_file_path, mode="r") as f:
+        csv_reader = csv.reader(f)
+        next(csv_reader)  # skip file header
+
+        node_label_dict: dict[str, str] = {}
+        node_name_dict: dict[str, str] = {}
+
+        # Read each row and populate the dictionaries
+        for row in csv_reader:
+            node_label_dict[row[NODE_ID_IDX]] = row[NODE_LABEL_IDX]
+            node_name_dict[row[NODE_ID_IDX]] = row[NODE_NAME_IDX]
+
+        return node_label_dict, node_name_dict
+
+
+def build_graph(edge_list_path: str) -> Graph:
+    """Build an undirected graph from edge list
 
     Args:
         edge_list_path (str): file name
 
     Returns:
-        G: a networkx undirected graph
+        A networkx undirected graph
     """
-    fh = open(edge_list_path, "rb")
-    G = nx.read_edgelist(fh, delimiter=',')
-    fh.close()
-    return G
-    
+    with open(file=edge_list_path, mode="rb") as f:
+        return nx.read_edgelist(path=f, delimiter=",")

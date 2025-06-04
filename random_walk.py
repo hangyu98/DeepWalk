@@ -1,53 +1,77 @@
+# Standard library imports
 import random
+from typing import Iterable
 
-def random_walk(G, node_id, walk_len, num_of_iter):
-    """ Generate a number of fixed-len random walks from a certain node
+# External library imports
+from networkx import Graph
+
+
+def random_walk(
+    graph: Graph, node_id: str, walk_length: int, num_of_iterations: int
+) -> list[list[str]]:
+    """
+    Generate a number of fixed-len random walks from a certain node
 
     Args:
-        G (nx.Graph): undirected graph G
+        graph (nx.Graph): undirected graph G
         node_id (str): node_id
-        walk_len (int): length of each random_walk
-        num_of_iter (int): repeat the random_walk process for how many times
+        walk_length (int): length of each random_walk
+        num_of_iterations (int): repeat the random_walk process for how many times
 
     Returns:
-        walks: 2-d walks of shape [num_of_iter, walk_len]
+        walks: 2-D walks of shape [num_of_iterations, walk_length]
     """
-    walks = []
-    # repeat num_of_iter times
-    for _ in range(num_of_iter):
-        cur_node = node_id
-        cur_walk = [node_id]
-        # sample (walk_len - 1) times
-        for _ in range(walk_len - 1):
-            # get all neighbors of cur_node
-            all_neighbors = G.neighbors(cur_node)
-            possible_next = []
-            for nei in all_neighbors:
-                possible_next.append(nei)
-            # randomly choose one node from all neighbors as next node
-            next_node = random.choice(possible_next)
-            cur_walk.append(next_node)
-            cur_node = next_node
-        walks.append(cur_walk)
-    # print(all_walks)
-    return walks
 
-def sample_graph(G, walk_len, num_of_iter):
-    """ Perform random-walk on all nodes in the graph
+    walk_path: list[list[str]] = []
+
+    # repeat num_of_iterations times
+    for _ in range(num_of_iterations):
+        cur_node: str = node_id
+        cur_walk_path: list[str] = [node_id]
+
+        # random walk from cur_node for walk_length steps
+        for _ in range(walk_length - 1):
+
+            # get all neighbors of cur_node
+            possible_next: list[str] = [
+                neighbor for neighbor in graph.neighbors(n=cur_node)
+            ]
+
+            # randomly choose one node from all neighbors as the next node to visit
+            next_node: str = random.choice(possible_next)
+            cur_walk_path.append(next_node)
+
+            cur_node = next_node
+
+        walk_path.append(cur_walk_path)
+
+    return walk_path
+
+
+def sample_graph(
+    graph: Graph, walk_length: int, num_of_iterations: int
+) -> list[list[str]]:
+    """Perform random-walk on all nodes in the graph
 
     Args:
-        G (nx.Graph): undirected graph G
-        walk_len (int): length of each random_walk
-        num_of_iter (int): repeat the random_walk process for how many times
+        graph (nx.Graph): undirected graph
+        walk_length (int): length of each random_walk
+        num_of_iterations (int): repeat the random_walk process for how many times
 
     Returns:
-        all_walks: all random_walks for graph G. shape: [num_of_iter * num_of_nodes, walk_len]
+        random walk results for the input graph of shape: [num_of_iterations * num_of_nodes, walk_length]
     """
-    all_walks = []
-    for n in G.nodes():
-        n_walk = random_walk(G, n, walk_len=walk_len, num_of_iter=num_of_iter)
-        all_walks = all_walks + n_walk # concat two lists
-    print(len(all_walks))
-    print(len(all_walks[0]))
-    return all_walks
-    
+    all_walk_paths: list[list[str]] = []
+
+    for n in graph.nodes():
+
+        walk_path: list[list[str]] = random_walk(
+            graph=graph,
+            node_id=n,
+            walk_length=walk_length,
+            num_of_iterations=num_of_iterations,
+        )
+
+        all_walk_paths = all_walk_paths + walk_path
+
+    return all_walk_paths
